@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   const sql = getDb();
   const rows = await sql`SELECT date FROM periods ORDER BY date ASC`;
-  const dates = rows.map((r) => (r.date as string).split("T")[0]);
+  const dates = rows.map((r) => (r.date as Date).toISOString().split("T")[0]);
 
   if (dates.length < 2) {
     return NextResponse.json({
