@@ -3,13 +3,26 @@ import Dashboard from "./dashboard";
 
 export const dynamic = "force-dynamic";
 
+const cstFormatter = new Intl.DateTimeFormat("zh-CN", {
+  timeZone: "Asia/Shanghai",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+});
+
+function formatDateCST(value: unknown): string {
+  const d = value instanceof Date ? value : new Date(String(value));
+  return cstFormatter.format(d).replace(/\//g, "-");
+}
+
 async function getData() {
   const sql = getDb();
   const rows = await sql`SELECT id, date, notes FROM periods ORDER BY date DESC`;
+  console.log('rows', rows);
   const periods = rows.map((r) => ({
     id: r.id as number,
-    date: (r.date as string).split("T")[0],
-    notes: (r.notes as string) || "",
+    date: formatDateCST(r.date),
+    notes: String(r.notes) || "",
   }));
 
   const dates = periods.map((p) => p.date).sort();
