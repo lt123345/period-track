@@ -27,6 +27,7 @@ export default function Dashboard({
   const [online, setOnline] = useState(true);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setOnline(navigator.onLine);
     const goOnline = () => setOnline(true);
     const goOffline = () => setOnline(false);
@@ -69,7 +70,7 @@ export default function Dashboard({
             经期记录
           </h1>
           <button
-            onClick={() => router.refresh()}
+            onClick={() => window.location.reload()}
             className="p-2 text-pink-600 hover:bg-pink-100 dark:hover:bg-zinc-800 rounded-lg transition-colors"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
