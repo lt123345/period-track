@@ -13,7 +13,12 @@ jobs:
           NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
           SITE_URL: ${{ secrets.SITE_URL }}
         run: |
-          DAYS=$(curl -s "$SITE_URL/api/prediction" | jq '.daysUntil')
+          RESPONSE=$(curl -s "$SITE_URL/api/prediction")
+          DAYS=$(echo "$RESPONSE" | jq -r '.daysUntil // empty')
+          if [ -z "$DAYS" ]; then
+            echo "Failed to get daysUntil from API. Response: $RESPONSE"
+            exit 1
+          fi
           if [ "$DAYS" -le 5 ] && [ "$DAYS" -gt 0 ]; then
             curl -d "预计 ${DAYS} 天后来大姨妈" ntfy.sh/$NTFY_TOPIC
           elif [ "$DAYS" -eq 0 ]; then
