@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface Period {
   id: number;
@@ -24,6 +24,19 @@ export default function Dashboard({
 }) {
   const router = useRouter();
   const [newDate, setNewDate] = useState(() => new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Shanghai" }));
+  const [online, setOnline] = useState(true);
+
+  useEffect(() => {
+    setOnline(navigator.onLine);
+    const goOnline = () => setOnline(true);
+    const goOffline = () => setOnline(false);
+    window.addEventListener("online", goOnline);
+    window.addEventListener("offline", goOffline);
+    return () => {
+      window.removeEventListener("online", goOnline);
+      window.removeEventListener("offline", goOffline);
+    };
+  }, []);
 
   const periods = initialPeriods;
   const prediction = initialPrediction;
@@ -63,6 +76,12 @@ export default function Dashboard({
           </button>
         </div>
 
+        {!online && (
+          <div className="bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-200 rounded-xl px-4 py-3 text-sm text-center">
+            当前处于离线模式，无法添加或删除记录
+          </div>
+        )}
+
         {/* Add Record */}
         <div className="bg-white dark:bg-zinc-800 rounded-2xl p-6 shadow-sm">
           <h2 className="text-lg font-semibold text-zinc-700 dark:text-zinc-200 mb-4">
@@ -77,7 +96,8 @@ export default function Dashboard({
             />
             <button
               onClick={addPeriod}
-              className="px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition-colors"
+              disabled={!online}
+              className="px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               添加
             </button>
@@ -174,7 +194,8 @@ export default function Dashboard({
                     )}
                     <button
                       onClick={() => { if (confirm("确定删除这条记录？")) deletePeriod(p.id); }}
-                      className="relative text-xs text-red-400 hover:text-red-600"
+                      disabled={!online}
+                      className="relative text-xs text-red-400 hover:text-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       删除
                     </button>
