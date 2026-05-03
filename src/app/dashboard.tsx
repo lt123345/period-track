@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { updateBadge } from "./register-sw";
 
 interface Period {
   id: number;
@@ -51,6 +52,7 @@ export default function Dashboard({
     });
     setNewDate("");
     router.refresh();
+    updateBadge();
   }
 
   async function deletePeriod(id: number) {
@@ -60,6 +62,7 @@ export default function Dashboard({
       body: JSON.stringify({ id }),
     });
     router.refresh();
+    updateBadge();
   }
 
   return (

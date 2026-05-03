@@ -22,8 +22,6 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "经期记录",
-  description: "经期记录与预测",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,

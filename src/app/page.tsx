@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { getDb } from "@/lib/db";
 import Dashboard from "./dashboard";
 
@@ -55,6 +56,21 @@ async function getData() {
   }
 
   return { periods, prediction: { averageCycle, predictedDate, daysUntil } };
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  const { prediction } = await getData();
+  const desc =
+    prediction.daysUntil != null
+      ? prediction.daysUntil <= 0
+        ? `大姨妈已超期 ${Math.abs(prediction.daysUntil)} 天`
+        : `下次大姨妈还有 ${prediction.daysUntil} 天`
+      : "经期记录与预测";
+  return {
+    title: "经期记录",
+    description: desc,
+    openGraph: { title: "经期记录", description: desc },
+  };
 }
 
 export default async function Home() {
