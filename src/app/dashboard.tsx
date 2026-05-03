@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { updateBadge } from "./register-sw";
+import RegisterSW from "./register-sw";
 
 interface Period {
   id: number;
@@ -52,7 +52,6 @@ export default function Dashboard({
     });
     setNewDate("");
     router.refresh();
-    updateBadge();
   }
 
   async function deletePeriod(id: number) {
@@ -62,11 +61,11 @@ export default function Dashboard({
       body: JSON.stringify({ id }),
     });
     router.refresh();
-    updateBadge();
   }
 
   return (
     <div className="min-h-screen bg-pink-50 dark:bg-zinc-900 p-6">
+      <RegisterSW daysUntil={prediction.daysUntil} />
       <div className="max-w-md mx-auto space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-pink-700 dark:text-pink-300">

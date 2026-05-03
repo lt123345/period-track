@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
+import { cache } from "react";
 import { getDb } from "@/lib/db";
 import Dashboard from "./dashboard";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 const cstFormatter = new Intl.DateTimeFormat("zh-CN", {
   timeZone: "Asia/Shanghai",
@@ -16,10 +17,10 @@ function formatDateCST(value: unknown): string {
   return cstFormatter.format(d).replace(/\//g, "-");
 }
 
-async function getData() {
+const getData = cache(async function getData() {
   const sql = getDb();
   const rows = await sql`SELECT id, date, notes FROM periods ORDER BY date DESC`;
-  console.log('rows', rows);
+
   const periods = rows.map((r) => ({
     id: r.id as number,
     date: formatDateCST(r.date),
@@ -56,7 +57,7 @@ async function getData() {
   }
 
   return { periods, prediction: { averageCycle, predictedDate, daysUntil } };
-}
+});
 
 export async function generateMetadata(): Promise<Metadata> {
   const { prediction } = await getData();

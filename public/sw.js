@@ -1,4 +1,4 @@
-const CACHE_NAME = "period-track-v2";
+const CACHE_NAME = "period-track-v3";
 const OFFLINE_URL = "/offline";
 
 const PRECACHE_URLS = ["/", "/offline"];
@@ -32,20 +32,19 @@ self.addEventListener("fetch", (event) => {
   // Skip chrome-extension and other non-http requests
   if (!request.url.startsWith("http")) return;
 
-  // For navigation requests: network-first, fallback to cache, then offline page
+  // For navigation requests: stale-while-revalidate
   if (request.mode === "navigate") {
     event.respondWith(
-      fetch(request)
-        .then((response) => {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
-          return response;
-        })
-        .catch(() =>
-          caches
-            .match(request)
-            .then((cached) => cached || caches.match(OFFLINE_URL))
-        )
+      caches.match(request).then((cached) => {
+        const fetchPromise = fetch(request)
+          .then((response) => {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+            return response;
+          })
+          .catch(() => cached || caches.match(OFFLINE_URL));
+        return cached || fetchPromise;
+      })
     );
     return;
   }

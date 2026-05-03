@@ -2,27 +2,25 @@
 
 import { useEffect } from "react";
 
-export async function updateBadge() {
+export function updateBadge(daysUntil?: number | null) {
   if (!("setAppBadge" in navigator)) return;
   try {
-    const res = await fetch("/api/prediction");
-    const data = await res.json();
-    if (data.daysUntil != null) {
-      navigator.setAppBadge(Math.max(0, data.daysUntil));
+    if (daysUntil != null) {
+      navigator.setAppBadge(Math.max(0, daysUntil));
     } else {
       navigator.clearAppBadge();
     }
   } catch {
-    // offline or fetch failed — leave badge as-is
+    // badge API not supported or failed
   }
 }
 
-export default function RegisterSW() {
+export default function RegisterSW({ daysUntil }: { daysUntil?: number | null }) {
   useEffect(() => {
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("/sw.js");
     }
-    updateBadge();
-  }, []);
+    updateBadge(daysUntil);
+  }, [daysUntil]);
   return null;
 }
